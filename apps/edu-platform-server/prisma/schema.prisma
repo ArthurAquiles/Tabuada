@@ -1,0 +1,83 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Category {
+  createdAt   DateTime  @default(now())
+  description String?
+  id          String    @id @default(cuid())
+  name        String?
+  subjects    Subject[]
+  updatedAt   DateTime  @updatedAt
+}
+
+model Subject {
+  category     Category?     @relation(fields: [categoryId], references: [id])
+  categoryId   String?
+  createdAt    DateTime      @default(now())
+  description  String?
+  exams        Exam[]
+  id           String        @id @default(cuid())
+  name         String?
+  updatedAt    DateTime      @updatedAt
+  videoLessons VideoLesson[]
+}
+
+model Exam {
+  createdAt   DateTime   @default(now())
+  description String?
+  id          String     @id @default(cuid())
+  questions   Question[]
+  subject     Subject?   @relation(fields: [subjectId], references: [id])
+  subjectId   String?
+  title       String?
+  updatedAt   DateTime   @updatedAt
+}
+
+model Answer {
+  answerText String?
+  createdAt  DateTime  @default(now())
+  id         String    @id @default(cuid())
+  isCorrect  Boolean?
+  question   Question? @relation(fields: [questionId], references: [id])
+  questionId String?
+  updatedAt  DateTime  @updatedAt
+}
+
+model VideoLesson {
+  createdAt   DateTime @default(now())
+  description String?
+  id          String   @id @default(cuid())
+  subject     Subject? @relation(fields: [subjectId], references: [id])
+  subjectId   String?
+  title       String?
+  updatedAt   DateTime @updatedAt
+  videoUrl    String?
+}
+
+model Question {
+  answers      Answer[]
+  createdAt    DateTime @default(now())
+  exam         Exam?    @relation(fields: [examId], references: [id])
+  examId       String?
+  id           String   @id @default(cuid())
+  questionText String?
+  updatedAt    DateTime @updatedAt
+}
+
+model User {
+  createdAt DateTime @default(now())
+  email     String?  @unique
+  firstName String?
+  id        String   @id @default(cuid())
+  lastName  String?
+  password  String
+  roles     Json
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+}
